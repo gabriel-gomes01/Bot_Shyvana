@@ -88,4 +88,4 @@ async def stop(ctx):
     else:
         await ctx.send("Não tem nada tocando.")
         
-bot.run('MTA4NTM0NTAwNjI4NzU4OTQxNg.GXkJo2.yB91QoC0RSSM8YS8Y9lPtt2eKNtCo_I-lecoD8')
+bot.run('')
