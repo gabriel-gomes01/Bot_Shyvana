@@ -7,8 +7,6 @@ import os
 
 #* 
 #    OBS: os parametros que cada função recebe são o "CTX" e "URL", contexto e link respectivamente
-# 
-# 
 # *#
 
 
@@ -18,37 +16,25 @@ intents = discord.Intents.all()
 # Configura o Prefixo do bot e dá as permissões a ele
 bot = commands.Bot(command_prefix='s.',intents=intents)
 
-#Lista de reprodução
-playlist = []
-
 # Inicia a conexão com o Discord
 @bot.event
 async def on_ready():
     print('Online.')
 
-# Join channel
-@bot.command(name='join')
-async def join(ctx):
-   
-   if not ctx.author.voice:
-       await ctx.send("Entre em um Canal de Voz")
-   else:
-        channel = ctx.author.voice.channel
-        voice_client = await  channel.connect()
-        await ctx.send("Entrei na Call")
-    
-   
-#Sair do canal de voz
-@bot.command(name="leave")
-async def leave(ctx):
-    await ctx.voice_client.disconnect()
-
 # play de musica
 @bot.command(name='play')
 async def play(ctx, url):
 
+    #Lista de reprodução
+    contador = 0
+    playlistDownload = []
+    playlistReproducao = []
+    
     guild = ctx.message.guild
     voice_client = guild.voice_client
+
+    playlistDownload.append(url)
+    await ctx.send(f'{url} adicionado à lista de reprodução.')
 
     ydl_opts = {
         'format': 'bestaudio/best',
@@ -60,8 +46,13 @@ async def play(ctx, url):
     }
 
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
-
+       
+        for file in os.listdir("./"):
+            if file.endswith(".mp3"):
+                os.remove(file)
+                for urls in playlistDownload:
+                    ydl.download([urls])
+        
 
     channel = ctx.author.voice.channel
     if not voice_client or not voice_client.is_connected():
@@ -69,5 +60,13 @@ async def play(ctx, url):
 
     await ctx.send(f'Tocando {url}')
 
+    for file in os.listdir("./"):
+        if file.endswith(".mp3"):
+            playlistReproducao.append(file)
+
+   # for music in playlistReproducao:
+   #     await voice_client.play(discord.FFmpegPCMAudio(music))
+   #     voice_client.source = discord.PCMVolumeTransformer(voice_client.source)
+   #     voice_client.source.volume = 0.10
 
 bot.run('TOKEN')
